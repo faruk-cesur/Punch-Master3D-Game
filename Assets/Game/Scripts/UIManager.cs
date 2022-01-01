@@ -130,10 +130,8 @@ public class UIManager : MonoBehaviour
 
     public void NextLevelButton()
     {
-        // Bir sonraki level Instantiate edilecek. (Level Manager'dan method cagrilabilir) Simdilik Retry ekliyorum.
-        RetryButton();
         PlayerPrefs.SetInt("SliderLevel", PlayerPrefs.GetInt("SliderLevel") + 1);
         sliderLevelText.text = PlayerPrefs.GetInt("SliderLevel").ToString();
-        LevelManager.instance.NextLevel();
+        LevelManager.Instance.NextLevel();
     }
 }

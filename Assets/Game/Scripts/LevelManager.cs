@@ -1,37 +1,65 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-    [SerializeField] List<Transform> levels;
-    public LevelSetting currentLevelSetting;
-    private int currentLevel;
-    public static LevelManager instance;
+    private static LevelManager _instance;
+    public static LevelManager Instance => _instance;
+
+    public List<GameObject> levels;
+
+    [HideInInspector] public int currentLevel;
+
     private void Awake()
     {
-      //PlayerPrefs.SetInt("currentLevel", 0);
-
-      instance = this;
-      currentLevel = PlayerPrefs.GetInt("currentLevel", 0);
-      currentLevelSetting = levels[currentLevel].GetComponent<LevelSetting>();
-      levels[currentLevel].gameObject.SetActive(true);
-
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
     }
 
-    void Start()
+    private void Start()
     {
-        UIManager.Instance.distanceFinish = currentLevelSetting.distanceFinish;
+        SetLevelPlayerPrefs();
+        CallLevel();
     }
 
-    void Update()
+    public void SetLevelPlayerPrefs()
     {
-        
+        if (!PlayerPrefs.HasKey("CurrentLevel"))
+        {
+            currentLevel = 1;
+            PlayerPrefs.SetInt("CurrentLevel", currentLevel);
+        }
+        else
+        {
+            currentLevel = PlayerPrefs.GetInt("CurrentLevel");
+        }
+    }
+
+    public void CallLevel()
+    {
+        if (currentLevel > levels.Count)
+        {
+            currentLevel = 1;
+            PlayerPrefs.SetInt("CurrentLevel", currentLevel);
+            levels[PlayerPrefs.GetInt("CurrentLevel") - 1].SetActive(true);
+        }
+        else
+        {
+            levels[PlayerPrefs.GetInt("CurrentLevel") - 1].SetActive(true);
+        }
     }
 
     public void NextLevel()
     {
-        levels[currentLevel].gameObject.SetActive(false);
-        PlayerPrefs.SetInt("currentLevel", currentLevel + 1);
+        currentLevel++; 
+        PlayerPrefs.SetInt("CurrentLevel", currentLevel);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
